@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <circle cx="96" cy="96" r="96" fill="#30CED5"/>
   <circle cx="96" cy="96" r="80" fill="#30348A"/>
-  <text x="34" y="95" font-family="Arial Black, sans-serif" font-weight="900" font-size="48" fill="#FEF6DC">FLIP</text>
-  <text x="56" y="155" font-family="Arial Black, sans-serif" font-weight="900" font-size="76" fill="#DD5969">7</text>
+  <text x="96" y="74" text-anchor="middle" dominant-baseline="central" font-family="Arial Black, sans-serif" font-weight="900" font-size="46" fill="#FEF6DC">FLIP</text>
+  <text x="96" y="126" text-anchor="middle" dominant-baseline="central" font-family="Arial Black, sans-serif" font-weight="900" font-size="62" fill="#DD5969">7</text>
 </svg>
