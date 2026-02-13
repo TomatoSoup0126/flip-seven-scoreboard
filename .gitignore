@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dev
+*.local
+
+# Test artifacts
+screenshots/
+test-screenshots/
+responsive-screenshots/
+TEST_REPORT.md
+FLIP7_UI_ANALYSIS.md
