@@ -1,8 +1,10 @@
 # Flip 7 Scoreboard
 
-A web-based scoreboard application for the **Flip 7** card game.
+An **unofficial** web-based scoreboard application for the **Flip 7** card game, inspired by the [official Score Tracker App](https://flip7-46611.web.app/).
 
-> Flip 7 卡牌遊戲計分板
+> 非官方的 Flip 7 卡牌遊戲計分板，參考[官方計分 APP](https://flip7-46611.web.app/) 設計。
+
+*This project is not affiliated with or endorsed by The Op Games.*
 
 ## Features
 
