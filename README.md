@@ -62,6 +62,12 @@ Based on the official Flip 7 rules:
 - Flipping an 8th card is a **Bust** (0 points for the round)
 - First player to reach **200 points** wins
 
+## Support
+
+If you find this project useful, consider buying me a coffee!
+
+<a href="https://www.buymeacoffee.com/tomatosoup" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" /></a>
+
 ## License
 
 MIT
