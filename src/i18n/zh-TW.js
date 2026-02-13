@@ -47,6 +47,11 @@ export default {
 
   // Menu
   language: '語言',
+  darkMode: '深色模式',
+  gameRules: '官方網站',
+  resetAll: '重置所有資料',
+  confirmResetAll: '確定要重置所有資料嗎？玩家與分數將全部清除。',
+  supportUs: 'Buy Me a Coffee',
   menu: '選單',
   sourceCode: 'GitHub',
 }

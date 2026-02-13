@@ -47,6 +47,30 @@
   --transition-slow: 350ms ease;
 }
 
+/* === Dark Mode === */
+html.dark {
+  --color-bg: #1a1a2e;
+  --color-container: #16213e;
+  --color-container-border: #0f3460;
+  --color-content: #1a1a2e;
+  --color-primary: #4fc3f7;
+  --color-primary-dark: #0288d1;
+  --color-accent: #4db6ac;
+  --color-highlight: #f9dd69;
+  --color-danger: #ef5350;
+  --color-text-light: #e0e0e0;
+  --color-text-dark: rgba(255, 255, 255, 0.87);
+  --color-text-muted: rgba(255, 255, 255, 0.54);
+  --color-disabled: #555555;
+  --color-gray-light: #2a2a3e;
+  --color-white: #1e1e32;
+  --color-teal-light: #1a2e3e;
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
 /* === Global Reset & Base === */
 *,
 *::before,

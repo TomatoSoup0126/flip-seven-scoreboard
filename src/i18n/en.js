@@ -47,6 +47,11 @@ export default {
 
   // Menu
   language: 'Language',
+  darkMode: 'Dark Mode',
+  gameRules: 'Official Website',
+  resetAll: 'Reset All Data',
+  confirmResetAll: 'Reset all data? All players and scores will be cleared.',
+  supportUs: 'Buy Me a Coffee',
   menu: 'Menu',
   sourceCode: 'GitHub',
 }

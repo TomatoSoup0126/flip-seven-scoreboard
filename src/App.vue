@@ -83,20 +83,77 @@
               </div>
             </div>
 
-            <!-- GitHub -->
+            <!-- Dark Mode -->
+            <div class="drawer-item">
+              <span class="drawer-item__label">{{ t('darkMode') }}</span>
+              <div class="drawer-lang-switch">
+                <button
+                  class="drawer-lang-btn"
+                  :class="{ 'drawer-lang-btn--active': !isDark }"
+                  @click="setDarkMode(false)"
+                  aria-label="Light mode"
+                >
+                  Light
+                </button>
+                <button
+                  class="drawer-lang-btn"
+                  :class="{ 'drawer-lang-btn--active': isDark }"
+                  @click="setDarkMode(true)"
+                  aria-label="Dark mode"
+                >
+                  Dark
+                </button>
+              </div>
+            </div>
+
+            <!-- Game Rules -->
             <a
               class="drawer-item drawer-item--link"
-              href="https://github.com/TomatoSoup0126/flip-seven-scoreboard"
+              href="https://theop.games/pages/flip-7"
               target="_blank"
               rel="noopener noreferrer"
               @click="showMenu = false"
             >
-              <svg class="drawer-item__icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              <span class="drawer-item__label">{{ t('sourceCode') }}</span>
+              <span class="drawer-item__label">{{ t('gameRules') }}</span>
               <span class="drawer-item__arrow">›</span>
             </a>
+
+            <!-- Reset All -->
+            <button class="drawer-item drawer-item--danger" @click="confirmResetAll">
+              <span class="drawer-item__label">{{ t('resetAll') }}</span>
+            </button>
+
+            <!-- Footer links (pinned to bottom) -->
+            <div class="drawer-footer">
+              <a
+                class="drawer-footer-link"
+                href="https://www.buymeacoffee.com/tomatosoup"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="showMenu = false"
+              >
+                <svg class="drawer-footer-link__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                  <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+                  <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
+                  <line x1="6" y1="2" x2="6" y2="4"/>
+                  <line x1="10" y1="2" x2="10" y2="4"/>
+                  <line x1="14" y1="2" x2="14" y2="4"/>
+                </svg>
+                <span class="drawer-footer-link__label">{{ t('supportUs') }}</span>
+              </a>
+              <a
+                class="drawer-footer-link"
+                href="https://github.com/TomatoSoup0126/flip-seven-scoreboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="showMenu = false"
+              >
+                <svg class="drawer-footer-link__icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span class="drawer-footer-link__label">{{ t('sourceCode') }}</span>
+              </a>
+            </div>
           </div>
         </div>
       </Transition>
@@ -163,6 +220,23 @@ function switchLocale(loc) {
   setLocale(loc)
 }
 
+// --- Dark Mode ---
+const DARK_KEY = 'flip7-dark-mode'
+const isDark = ref(localStorage.getItem(DARK_KEY) === 'true')
+
+function applyDarkMode(val) {
+  document.documentElement.classList.toggle('dark', val)
+}
+
+function setDarkMode(val) {
+  isDark.value = val
+  localStorage.setItem(DARK_KEY, val)
+  applyDarkMode(val)
+}
+
+// Apply on load
+applyDarkMode(isDark.value)
+
 // --- Add Player ---
 const showAddPlayer = ref(false)
 
@@ -215,6 +289,19 @@ function confirmNewGame() {
   confirmState.cancelText = t('cancel')
   confirmState.onConfirm = () => {
     store.newGame()
+    confirmState.visible = false
+    winnerDismissed.value = false
+  }
+  confirmState.visible = true
+}
+
+function confirmResetAll() {
+  showMenu.value = false
+  confirmState.message = t('confirmResetAll')
+  confirmState.confirmText = t('confirm')
+  confirmState.cancelText = t('cancel')
+  confirmState.onConfirm = () => {
+    store.resetAll()
     confirmState.visible = false
     winnerDismissed.value = false
   }
@@ -513,28 +600,6 @@ watch(() => store.rounds, (val) => {
   border-bottom: 1px solid var(--color-gray-light);
 }
 
-.drawer-item:last-child {
-  border-bottom: none;
-}
-
-.drawer-item--link {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  gap: 12px;
-  justify-content: flex-start;
-  transition: background var(--transition-fast);
-}
-
-.drawer-item--link:active {
-  background: var(--color-teal-light);
-}
-
-.drawer-item__icon {
-  flex-shrink: 0;
-  color: var(--color-text-dark);
-}
-
 .drawer-item__label {
   font-family: var(--font-primary);
   font-size: 0.95rem;
@@ -542,10 +607,74 @@ watch(() => store.rounds, (val) => {
 }
 
 .drawer-item__arrow {
-  margin-left: auto;
   font-size: 1.4rem;
   color: var(--color-text-muted);
   line-height: 1;
+}
+
+.drawer-item--link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.drawer-item--link:active {
+  background: var(--color-teal-light);
+}
+
+.drawer-item--danger {
+  cursor: pointer;
+  background: none;
+  width: 100%;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.drawer-item--danger .drawer-item__label {
+  color: var(--color-danger);
+}
+
+.drawer-item--danger:active {
+  background: rgba(221, 89, 105, 0.08);
+}
+
+/* Drawer Footer */
+.drawer-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--color-gray-light);
+}
+
+.drawer-footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px var(--space-md);
+  text-decoration: none;
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast);
+}
+
+.drawer-footer-link + .drawer-footer-link {
+  border-top: 1px solid var(--color-gray-light);
+}
+
+.drawer-footer-link:active {
+  background: var(--color-teal-light);
+}
+
+.drawer-footer-link__icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.drawer-footer-link__label {
+  font-family: var(--font-primary);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 /* Language Switch */
@@ -555,16 +684,20 @@ watch(() => store.rounds, (val) => {
   background: var(--color-teal-light);
   border-radius: var(--radius-sm);
   padding: 3px;
+  flex-shrink: 0;
 }
 
 .drawer-lang-btn {
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 700;
+  line-height: 1.2;
   color: var(--color-text-muted);
   background: transparent;
+  text-align: center;
+  white-space: nowrap;
   transition: all var(--transition-fast);
 }
 
