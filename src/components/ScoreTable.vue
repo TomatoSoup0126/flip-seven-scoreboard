@@ -14,16 +14,18 @@
       <div v-if="store.playersSortedByScore.length === 0" class="score-table__empty">
         <p>{{ t('emptyState') }}</p>
       </div>
-      <PlayerRow
-        v-for="player in store.playersSortedByScore"
-        :key="player.id"
-        :player="player"
-        :start-round="startRound"
-        :visible-count="visibleRounds"
-        :slide-direction="slideDirection"
-        @edit-score="onEditScore"
-        @delete="onDeletePlayer"
-      />
+      <TransitionGroup name="player-reorder" tag="div">
+        <PlayerRow
+          v-for="player in store.playersSortedByScore"
+          :key="player.id"
+          :player="player"
+          :start-round="startRound"
+          :visible-count="visibleRounds"
+          :slide-direction="slideDirection"
+          @edit-score="onEditScore"
+          @delete="onDeletePlayer"
+        />
+      </TransitionGroup>
     </div>
   </div>
 </template>
@@ -109,5 +111,30 @@ function onDeletePlayer(playerId) {
   color: var(--color-primary);
   text-align: center;
   opacity: 0.6;
+}
+
+/* Player reorder transition (FLIP animation) */
+.player-reorder-move {
+  transition: transform 0.4s ease;
+}
+
+.player-reorder-enter-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.player-reorder-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: absolute;
+  width: 100%;
+}
+
+.player-reorder-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.player-reorder-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
 }
 </style>
