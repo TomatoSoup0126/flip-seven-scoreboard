@@ -48,5 +48,5 @@ export default {
   // Menu
   language: '語言',
   menu: '選單',
-  sourceCode: '原始碼',
+  sourceCode: 'GitHub',
 }

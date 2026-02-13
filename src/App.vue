@@ -86,7 +86,7 @@
             <!-- GitHub -->
             <a
               class="drawer-item drawer-item--link"
-              href="https://github.com"
+              href="https://github.com/TomatoSoup0126/flip-seven-scoreboard"
               target="_blank"
               rel="noopener noreferrer"
               @click="showMenu = false"

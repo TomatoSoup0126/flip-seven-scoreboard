@@ -48,5 +48,5 @@ export default {
   // Menu
   language: 'Language',
   menu: 'Menu',
-  sourceCode: 'Source Code',
+  sourceCode: 'GitHub',
 }
