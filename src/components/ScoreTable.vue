@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameStore } from '../stores/game.js'
 import RoundNav from './RoundNav.vue'
@@ -52,6 +52,17 @@ function handleResize() {
 
 onMounted(() => window.addEventListener('resize', handleResize))
 onUnmounted(() => window.removeEventListener('resize', handleResize))
+
+// Reset to first round when a new game starts (scores cleared)
+watch(
+  () => Object.keys(store.scores).length,
+  (len) => {
+    if (len === 0) {
+      startRound.value = 0
+      slideDirection.value = 'next'
+    }
+  }
+)
 
 const visibleRounds = computed(() => {
   if (windowWidth.value <= 480) return 2
