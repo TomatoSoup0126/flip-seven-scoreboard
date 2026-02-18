@@ -67,13 +67,23 @@ watch(
 )
 
 const visibleRounds = computed(() => {
-  const isCompactLandscape = windowWidth.value >= 700
+  const isCompactLandscape = windowWidth.value >= 560
     && windowHeight.value <= 620
     && (windowWidth.value / Math.max(windowHeight.value, 1)) >= 1.45
 
   if (isCompactLandscape) {
     if (windowWidth.value >= 1180) return 5
-    if (windowWidth.value >= 900) return 4
+    if (windowWidth.value >= 960) return 4
+    if (windowWidth.value >= 680) return 3
+    return 2
+  }
+
+  const isPhoneLandscape = windowWidth.value >= 560
+    && windowWidth.value <= 900
+    && windowHeight.value <= 460
+    && (windowWidth.value / Math.max(windowHeight.value, 1)) >= 1.55
+
+  if (isPhoneLandscape) {
     return 3
   }
   if (windowWidth.value <= 480) return 2

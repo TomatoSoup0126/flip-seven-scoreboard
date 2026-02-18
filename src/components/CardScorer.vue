@@ -575,6 +575,129 @@ function onCancel() {
   }
 }
 
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 1023px) {
+  .scorer-overlay {
+    align-items: center;
+    padding: 6px;
+  }
+
+  .scorer-panel {
+    max-width: min(100vw - 12px, 980px);
+    max-height: calc(100dvh - 12px);
+    border-radius: 12px;
+    padding: 8px 10px 10px;
+  }
+
+  .scorer-header {
+    margin-bottom: 8px;
+  }
+
+  .scorer-title {
+    font-size: 0.95rem;
+  }
+
+  .scorer-close {
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .scorer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(220px, 1fr);
+    gap: 0 10px;
+    align-items: start;
+  }
+
+  .scorer-inputs {
+    gap: 8px;
+  }
+
+  .scorer-summary {
+    gap: 8px;
+  }
+
+  .scorer-label {
+    margin-bottom: 4px;
+    font-size: 0.74rem;
+  }
+
+  .scorer-cards {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .card-btn {
+    font-size: 0.8rem;
+    border-width: 1.5px;
+  }
+
+  .scorer-hint {
+    margin-top: 2px;
+    font-size: 0.66rem;
+    line-height: 1.25;
+  }
+
+  .scorer-modifiers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .mod-btn {
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 0.78rem;
+    border-width: 1.5px;
+  }
+
+  .special-toggle {
+    padding: 6px 8px;
+    font-size: 0.74rem;
+  }
+
+  .special-toggle input {
+    width: 14px;
+    height: 14px;
+  }
+
+  .scorer-preview {
+    padding: 8px 10px;
+  }
+
+  .preview-row {
+    padding: 2px 0;
+    font-size: 0.76rem;
+  }
+
+  .preview-total {
+    margin-top: 5px;
+    padding-top: 5px;
+    font-size: 0.88rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.1rem;
+  }
+
+  .flip7-badge {
+    padding: 5px;
+    font-size: 0.86rem;
+    letter-spacing: 0.5px;
+  }
+
+  .scorer-btn {
+    padding: 8px 8px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 430px) and (max-width: 1023px) {
+  .scorer-hint {
+    display: none;
+  }
+}
+
 @media (min-width: 1024px) and (min-height: 640px) {
   .scorer-panel {
     max-width: min(980px, calc(100vw - 48px));
