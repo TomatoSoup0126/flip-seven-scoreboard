@@ -14,7 +14,7 @@ An **unofficial** web-based scoreboard application for the **Flip 7** card game,
   - Classic: number cards `0–12`, modifiers `+2 ~ +10`, `×2`
   - VENGEANCE: number cards `0–13`, modifiers `-2 ~ -10`, `÷2`, with Zero and Lucky 13 support
   - Automatic Flip 7 bonus detection (`+15`)
-- **Multi-player support** — add up to 8 players, track scores across unlimited rounds
+- **Multi-player support** — add players and track scores across unlimited rounds
 - **Real-time leaderboard** — players sorted by total score
 - **Undo** — revert the last scoring action
 - **Winner celebration** — confetti animation when a player reaches 200 points

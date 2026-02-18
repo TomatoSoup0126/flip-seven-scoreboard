@@ -71,7 +71,7 @@ export default {
   tourSkip: 'Skip',
   tourStepHeader: 'This is the Flip 7 scoreboard home.',
   tourStepScoreTable: 'This is the score area. Tap any score cell to edit.',
-  tourStepAddPlayer: 'Start by adding players here (up to 8).',
+  tourStepAddPlayer: 'Start by adding players here.',
   tourStepNewGame: 'New Game clears scores but keeps players.',
   tourStepMenu: 'Open this menu to change language, dark mode, and mode.',
   gameRules: 'Official Rules',

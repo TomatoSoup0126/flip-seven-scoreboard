@@ -71,7 +71,7 @@ export default {
   tourSkip: '略過',
   tourStepHeader: '這裡是 Flip 7 計分板主畫面。',
   tourStepScoreTable: '這裡是分數區，點擊分數格即可編輯。',
-  tourStepAddPlayer: '先從這裡新增玩家（最多 8 位）。',
+  tourStepAddPlayer: '先從這裡新增玩家。',
   tourStepNewGame: '新遊戲會清空本局分數，但保留玩家名單。',
   tourStepMenu: '打開這裡可調整語言、深色模式與模式。',
   gameRules: '官方規則',

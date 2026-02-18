@@ -34,7 +34,6 @@
         <button
           class="toolbar-btn toolbar-btn--add"
           data-tour="add-player-btn"
-          :disabled="store.players.length >= 8"
           @click="showAddPlayer = true"
         >
           {{ t('addPlayer') }}
