@@ -674,4 +674,113 @@ function onCancel() {
     font-size: 0.95rem;
   }
 }
+
+@media (min-width: 1366px) and (min-height: 720px) {
+  .scorer-panel {
+    max-width: min(1280px, calc(100vw - 72px));
+    max-height: min(90dvh, 860px);
+    padding: 10px 14px 12px;
+  }
+
+  .scorer-main {
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: 0 12px;
+  }
+
+  .scorer-inputs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+    grid-template-areas:
+      'numbers modifiers'
+      'numbers special';
+    gap: 10px 12px;
+    align-items: start;
+  }
+
+  .scorer-section--numbers {
+    grid-area: numbers;
+  }
+
+  .scorer-section--modifiers {
+    grid-area: modifiers;
+  }
+
+  .scorer-section--special {
+    grid-area: special;
+  }
+
+  .scorer-label {
+    margin-bottom: 5px;
+  }
+
+  .scorer-cards {
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .card-btn {
+    font-size: 0.88rem;
+  }
+
+  .scorer-hint {
+    margin-top: 2px;
+    font-size: 0.68rem;
+    line-height: 1.3;
+  }
+
+  .scorer-modifiers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .mod-btn {
+    min-width: 0;
+    padding: 7px 4px;
+    font-size: 0.82rem;
+  }
+
+  .special-toggle {
+    padding: 7px 9px;
+    font-size: 0.8rem;
+  }
+
+  .special-toggle input {
+    width: 14px;
+    height: 14px;
+  }
+
+  .scorer-summary {
+    gap: 10px;
+  }
+
+  .scorer-preview {
+    padding: 9px 11px;
+  }
+
+  .preview-row {
+    padding: 2px 0;
+    font-size: 0.8rem;
+  }
+
+  .preview-total {
+    margin-top: 5px;
+    padding-top: 5px;
+    font-size: 0.92rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.16rem;
+  }
+
+  .flip7-badge {
+    padding: 6px;
+    font-size: 0.94rem;
+  }
+
+  .scorer-btn {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
 </style>
