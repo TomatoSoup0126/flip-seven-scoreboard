@@ -8,14 +8,20 @@ An **unofficial** web-based scoreboard application for the **Flip 7** card game,
 
 ## Features
 
-- **Card-based scoring** — select number cards (0–12), modifier cards (+2 to +10, ×2), with automatic Flip 7 bonus detection
+- **Dual rule modes** — switch between **Classic** and **VENGEANCE** in Menu  
+  (switching mode resets current game scores/rounds, while keeping player setup)
+- **Mode-aware card scoring**
+  - Classic: number cards `0–12`, modifiers `+2 ~ +10`, `×2`
+  - VENGEANCE: number cards `0–13`, modifiers `-2 ~ -10`, `÷2`, with Zero and Lucky 13 support
+  - Automatic Flip 7 bonus detection (`+15`)
 - **Multi-player support** — add up to 8 players, track scores across unlimited rounds
 - **Real-time leaderboard** — players sorted by total score
 - **Undo** — revert the last scoring action
 - **Winner celebration** — confetti animation when a player reaches 200 points
+- **Guided tour mode** — built-in website tour with spotlight/highlight effect for onboarding
 - **i18n** — Traditional Chinese (繁體中文) and English, auto-detected from browser locale
 - **PWA** — installable on mobile home screens, works offline
-- **Responsive design** — optimized for mobile, tablet, and desktop
+- **Responsive design** — optimized for portrait/landscape mobile, tablet, 16:9 desktop, and ultrawide screens
 
 ## Tech Stack
 
@@ -23,6 +29,7 @@ An **unofficial** web-based scoreboard application for the **Flip 7** card game,
 - [Vite](https://vitejs.dev/)
 - [Pinia](https://pinia.vuejs.org/) — state management with localStorage persistence
 - [vue-i18n](https://vue-i18n.intlify.dev/) — internationalization
+- [@globalhive/vuejs-tour](https://www.npmjs.com/package/@globalhive/vuejs-tour) — guided onboarding tour
 - [canvas-confetti](https://github.com/catdad/canvas-confetti) — winner celebration effects
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) — PWA support
 
@@ -58,11 +65,19 @@ npm run preview
 
 ## Game Rules Reference
 
-Based on the official Flip 7 rules:
-- Each round, players flip cards and try to get as close to 7 cards as possible without going over
-- Exactly 7 cards grants a **Flip 7 bonus** (+15 points)
-- Flipping an 8th card is a **Bust** (0 points for the round)
-- First player to reach **200 points** wins
+This app references the official Flip 7 scoring concepts and currently supports two score modes:
+
+- **Classic mode**
+  - Number cards `0–12`
+  - Modifiers: `+2, +4, +6, +8, +10`, `×2`
+  - Flip 7 bonus: `+15`
+- **VENGEANCE mode**
+  - Number cards `0–13`
+  - Modifiers: `-2, -4, -6, -8, -10`, `÷2` (round down)
+  - Zero card effect and Lucky 13 extra-card scoring support
+  - Flip 7 bonus: `+15`
+
+Official rules link: <https://theop.games/pages/flip-7>
 
 ## Support
 
