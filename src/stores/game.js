@@ -85,7 +85,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function addPlayer(name) {
-    if (players.value.length >= 8) return
     const id = nextPlayerId.value++
     const colorIndex = (players.value.length) % PLAYER_COLORS.length
     players.value.push({
