@@ -9,82 +9,116 @@
             <button class="scorer-close" @click="onCancel" :aria-label="t('close')">✕</button>
           </div>
 
-          <!-- Number Cards -->
-          <div class="scorer-section">
-            <div class="scorer-label">{{ t('numberCards') }}</div>
-            <div class="scorer-cards">
-              <button
-                v-for="n in 13"
-                :key="n - 1"
-                class="card-btn"
-                :class="{ 'card-btn--active': selectedCards.has(n - 1) }"
-                @click="toggleCard(n - 1)"
-              >
-                {{ n - 1 }}
-              </button>
-            </div>
-          </div>
+          <div class="scorer-main">
+            <div class="scorer-inputs">
+              <!-- Number Cards -->
+              <div class="scorer-section scorer-section--numbers">
+                <div class="scorer-label">{{ t('numberCards') }}</div>
+                <div class="scorer-cards">
+                  <button
+                    v-for="n in numberCardValues"
+                    :key="n"
+                    class="card-btn"
+                    :class="{ 'card-btn--active': selectedCards.has(n) }"
+                    @click="toggleCard(n)"
+                  >
+                    {{ n }}
+                  </button>
+                </div>
+                <p v-if="isVengeanceMode" class="scorer-hint">
+                  {{ t('vengeanceNumberHint') }}
+                </p>
+              </div>
 
-          <!-- Modifier Cards -->
-          <div class="scorer-section">
-            <div class="scorer-label">{{ t('modifierCards') }}</div>
-            <div class="scorer-modifiers">
-              <button
-                v-for="m in [2, 4, 6, 8, 10]"
-                :key="'mod-' + m"
-                class="mod-btn"
-                :class="{ 'mod-btn--active': selectedModifiers.has(m) }"
-                @click="toggleModifier(m)"
-              >
-                +{{ m }}
-              </button>
-              <button
-                class="mod-btn mod-btn--x2"
-                :class="{ 'mod-btn--active': hasX2 }"
-                @click="hasX2 = !hasX2"
-              >
-                {{ t('multiplier') }}
-              </button>
-            </div>
-          </div>
+              <!-- Modifier Cards -->
+              <div class="scorer-section scorer-section--modifiers">
+                <div class="scorer-label">{{ t('modifierCards') }}</div>
+                <div class="scorer-modifiers">
+                  <button
+                    v-for="m in modifierValues"
+                    :key="'mod-' + m"
+                    class="mod-btn"
+                    :class="{ 'mod-btn--active': selectedModifiers.has(m) }"
+                    @click="toggleModifier(m)"
+                  >
+                    {{ isVengeanceMode ? '-' : '+' }}{{ m }}
+                  </button>
+                  <button
+                    class="mod-btn mod-btn--x2"
+                    :class="{ 'mod-btn--active': hasX2 }"
+                    @click="hasX2 = !hasX2"
+                  >
+                    {{ isVengeanceMode ? t('divideByTwo') : t('multiplier') }}
+                  </button>
+                </div>
+              </div>
 
-          <!-- Score Preview -->
-          <div class="scorer-preview">
-            <div class="preview-row">
-              <span>{{ t('numberCardSum') }}</span>
-              <span>{{ scoreBreakdown.numberSum }}</span>
+              <!-- Vengeance Special Cards -->
+              <div v-if="isVengeanceMode" class="scorer-section scorer-section--special">
+                <div class="scorer-label">{{ t('vengeanceSpecialCards') }}</div>
+                <label class="special-toggle" :class="{ 'special-toggle--disabled': !canEnableExtraLucky13 }">
+                  <input
+                    v-model="extraLucky13"
+                    type="checkbox"
+                    :disabled="!canEnableExtraLucky13"
+                  >
+                  <span>{{ t('lucky13Extra') }}</span>
+                </label>
+                <p class="scorer-hint">{{ t('lucky13Hint') }}</p>
+              </div>
             </div>
-            <div v-if="scoreBreakdown.afterX2 !== null" class="preview-row preview-row--accent">
-              <span>{{ t('multiplier') }}</span>
-              <span>{{ scoreBreakdown.afterX2 }}</span>
-            </div>
-            <div v-if="scoreBreakdown.modifierSum > 0" class="preview-row">
-              <span>{{ t('modifierBonus') }}</span>
-              <span>+{{ scoreBreakdown.modifierSum }}</span>
-            </div>
-            <div v-if="scoreBreakdown.flip7Bonus > 0" class="preview-row preview-row--flip7">
-              <span>{{ t('flip7Bonus') }}</span>
-              <span>+{{ scoreBreakdown.flip7Bonus }}</span>
-            </div>
-            <div class="preview-total">
-              <span>{{ t('roundTotal') }}</span>
-              <span class="preview-total__score">{{ scoreBreakdown.total }}</span>
-            </div>
-          </div>
 
-          <!-- Flip 7 indicator -->
-          <div v-if="selectedCards.size === 7" class="flip7-badge">
-            {{ t('flip7Badge') }}
-          </div>
+            <div class="scorer-summary">
+              <!-- Score Preview -->
+              <div class="scorer-preview">
+                <div class="preview-row">
+                  <span>{{ t('numberCardSum') }}</span>
+                  <span>{{ scoreBreakdown.numberSum }}</span>
+                </div>
+                <div v-if="scoreBreakdown.afterX2 !== null" class="preview-row preview-row--accent">
+                  <span>{{ t('multiplier') }}</span>
+                  <span>{{ scoreBreakdown.afterX2 }}</span>
+                </div>
+                <div v-if="scoreBreakdown.afterDivideBy2 !== null" class="preview-row preview-row--accent">
+                  <span>{{ t('divideByTwo') }}</span>
+                  <span>{{ scoreBreakdown.afterDivideBy2 }}</span>
+                </div>
+                <div v-if="scoreBreakdown.modifierSum > 0" class="preview-row">
+                  <span>{{ isVengeanceMode ? t('modifierPenalty') : t('modifierBonus') }}</span>
+                  <span>{{ isVengeanceMode ? '-' : '+' }}{{ scoreBreakdown.modifierSum }}</span>
+                </div>
+                <div
+                  v-if="isVengeanceMode && scoreBreakdown.hasZeroCard && scoreBreakdown.flip7Bonus === 0"
+                  class="preview-row preview-row--danger"
+                >
+                  <span>{{ t('zeroCardEffect') }}</span>
+                  <span>{{ t('scoreForcedToZero') }}</span>
+                </div>
+                <div v-if="scoreBreakdown.flip7Bonus > 0" class="preview-row preview-row--flip7">
+                  <span>{{ t('flip7Bonus') }}</span>
+                  <span>+{{ scoreBreakdown.flip7Bonus }}</span>
+                </div>
+                <div class="preview-total">
+                  <span>{{ t('roundTotal') }}</span>
+                  <span class="preview-total__score">{{ scoreBreakdown.total }}</span>
+                </div>
+              </div>
 
-          <!-- Actions -->
-          <div class="scorer-actions">
-            <button class="scorer-btn scorer-btn--bust" @click="onBust">
-              {{ t('bust') }}
-            </button>
-            <button class="scorer-btn scorer-btn--confirm" @click="onConfirm">
-              {{ t('confirm') }}
-            </button>
+              <!-- Flip 7 indicator -->
+              <div v-if="scoreBreakdown.cardCount === 7" class="flip7-badge">
+                {{ t('flip7Badge') }}
+              </div>
+
+              <!-- Actions -->
+              <div class="scorer-actions">
+                <button class="scorer-btn scorer-btn--bust" @click="onBust">
+                  {{ t('bust') }}
+                </button>
+                <button class="scorer-btn scorer-btn--confirm" @click="onConfirm">
+                  {{ t('confirm') }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -119,8 +153,21 @@ const store = useGameStore()
 const selectedCards = ref(new Set())
 const selectedModifiers = ref(new Set())
 const hasX2 = ref(false)
+const extraLucky13 = ref(false)
 
 const roundNumber = computed(() => props.roundIndex + 1)
+const isVengeanceMode = computed(() => store.gameMode === store.GAME_MODES.VENGEANCE)
+
+const numberCardValues = computed(() => {
+  const upperBound = isVengeanceMode.value ? 13 : 12
+  return Array.from({ length: upperBound + 1 }, (_, index) => index)
+})
+
+const modifierValues = [2, 4, 6, 8, 10]
+
+const canEnableExtraLucky13 = computed(() => {
+  return isVengeanceMode.value && selectedCards.value.has(13)
+})
 
 watch(() => props.visible, async (val) => {
   if (val) {
@@ -128,20 +175,31 @@ watch(() => props.visible, async (val) => {
       selectedCards.value = new Set(props.existingScore.cards ?? [])
       selectedModifiers.value = new Set(props.existingScore.modifiers ?? [])
       hasX2.value = props.existingScore.hasX2 ?? false
+      extraLucky13.value = props.existingScore.extraLucky13 ?? false
     } else {
       selectedCards.value = new Set()
       selectedModifiers.value = new Set()
       hasX2.value = false
+      extraLucky13.value = false
     }
     await nextTick()
     overlayRef.value?.focus()
   }
 })
 
+watch(canEnableExtraLucky13, (enabled) => {
+  if (!enabled) {
+    extraLucky13.value = false
+  }
+})
+
 const scoreBreakdown = computed(() => {
   const cards = [...selectedCards.value]
   const modifiers = [...selectedModifiers.value]
-  return store.calculateScore(cards, modifiers, hasX2.value)
+  return store.calculateScore(cards, modifiers, hasX2.value, {
+    mode: store.gameMode,
+    extraLucky13: extraLucky13.value
+  })
 })
 
 function toggleCard(num) {
@@ -167,14 +225,20 @@ function toggleModifier(mod) {
 function onConfirm() {
   const cards = [...selectedCards.value]
   const modifiers = [...selectedModifiers.value]
-  const breakdown = store.calculateScore(cards, modifiers, hasX2.value)
+  const extraLucky13Active = canEnableExtraLucky13.value && extraLucky13.value
+  const breakdown = store.calculateScore(cards, modifiers, hasX2.value, {
+    mode: store.gameMode,
+    extraLucky13: extraLucky13Active
+  })
   emit('confirm', {
     score: breakdown.total,
     cards,
     modifiers,
     hasX2: hasX2.value,
-    isFlip7: cards.length === 7,
-    isBust: false
+    extraLucky13: extraLucky13Active,
+    isFlip7: breakdown.flip7Bonus > 0,
+    isBust: false,
+    mode: store.gameMode
   })
 }
 
@@ -216,6 +280,19 @@ function onCancel() {
   box-shadow: var(--shadow-lg);
 }
 
+.scorer-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.scorer-inputs,
+.scorer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 .scorer-header {
   display: flex;
   align-items: center;
@@ -243,7 +320,7 @@ function onCancel() {
 }
 
 .scorer-section {
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
 }
 
 .scorer-label {
@@ -260,6 +337,13 @@ function onCancel() {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
+}
+
+.scorer-hint {
+  margin-top: var(--space-xs);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
 }
 
 .card-btn {
@@ -291,6 +375,29 @@ function onCancel() {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.special-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-white);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.special-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.special-toggle--disabled {
+  border-color: var(--color-disabled);
+  color: var(--color-text-muted);
 }
 
 .mod-btn {
@@ -333,7 +440,7 @@ function onCancel() {
   background: var(--color-white);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
 }
 
 .preview-row {
@@ -351,6 +458,11 @@ function onCancel() {
 
 .preview-row--flip7 {
   color: var(--color-primary);
+  font-weight: 700;
+}
+
+.preview-row--danger {
+  color: var(--color-danger);
   font-weight: 700;
 }
 
@@ -374,7 +486,7 @@ function onCancel() {
 .flip7-badge {
   text-align: center;
   padding: var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
   background: linear-gradient(135deg, var(--color-highlight), #FFB347);
   border-radius: var(--radius-md);
   font-family: var(--font-display);
@@ -448,7 +560,350 @@ function onCancel() {
   }
   .scorer-panel {
     border-radius: var(--radius-lg);
-    max-height: 80dvh;
+    max-width: 760px;
+    max-height: 88dvh;
+    padding: 14px var(--space-md) var(--space-md);
+  }
+
+  .card-btn {
+    font-size: 1rem;
+  }
+
+  .scorer-btn {
+    padding: 12px var(--space-md);
+    font-size: 1rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 1023px) {
+  .scorer-overlay {
+    align-items: center;
+    padding: 6px;
+  }
+
+  .scorer-panel {
+    max-width: min(100vw - 12px, 980px);
+    max-height: calc(100dvh - 12px);
+    border-radius: 12px;
+    padding: 8px 10px 10px;
+  }
+
+  .scorer-header {
+    margin-bottom: 8px;
+  }
+
+  .scorer-title {
+    font-size: 0.95rem;
+  }
+
+  .scorer-close {
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 0.9rem;
+  }
+
+  .scorer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(220px, 1fr);
+    gap: 0 10px;
+    align-items: start;
+  }
+
+  .scorer-inputs {
+    gap: 8px;
+  }
+
+  .scorer-summary {
+    gap: 8px;
+  }
+
+  .scorer-label {
+    margin-bottom: 4px;
+    font-size: 0.74rem;
+  }
+
+  .scorer-cards {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .card-btn {
+    font-size: 0.8rem;
+    border-width: 1.5px;
+  }
+
+  .scorer-hint {
+    margin-top: 2px;
+    font-size: 0.66rem;
+    line-height: 1.25;
+  }
+
+  .scorer-modifiers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .mod-btn {
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 0.78rem;
+    border-width: 1.5px;
+  }
+
+  .special-toggle {
+    padding: 6px 8px;
+    font-size: 0.74rem;
+  }
+
+  .special-toggle input {
+    width: 14px;
+    height: 14px;
+  }
+
+  .scorer-preview {
+    padding: 8px 10px;
+  }
+
+  .preview-row {
+    padding: 2px 0;
+    font-size: 0.76rem;
+  }
+
+  .preview-total {
+    margin-top: 5px;
+    padding-top: 5px;
+    font-size: 0.88rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.1rem;
+  }
+
+  .flip7-badge {
+    padding: 5px;
+    font-size: 0.86rem;
+    letter-spacing: 0.5px;
+  }
+
+  .scorer-btn {
+    padding: 8px 8px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 430px) and (max-width: 1023px) {
+  .scorer-hint {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 640px) {
+  .scorer-panel {
+    max-width: min(980px, calc(100vw - 48px));
+    max-height: min(94dvh, 860px);
+    overflow-y: auto;
+    padding: 12px var(--space-md) var(--space-md);
+  }
+
+  .scorer-header {
+    margin-bottom: 10px;
+  }
+
+  .scorer-title {
+    font-size: 1rem;
+  }
+
+  .scorer-close {
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .scorer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+    gap: 0 var(--space-md);
+    align-items: start;
+  }
+
+  .scorer-inputs {
+    gap: 12px;
+  }
+
+  .scorer-summary {
+    gap: 12px;
+  }
+
+  .scorer-label {
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+  }
+
+  .scorer-cards {
+    gap: 5px;
+  }
+
+  .scorer-hint {
+    margin-top: 3px;
+    font-size: 0.72rem;
+  }
+
+  .card-btn {
+    font-size: 0.95rem;
+  }
+
+  .mod-btn {
+    min-width: 64px;
+    padding: 8px 6px;
+    font-size: 0.9rem;
+  }
+
+  .special-toggle {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .scorer-preview {
+    padding: 10px 12px;
+  }
+
+  .preview-row {
+    padding: 3px 0;
+    font-size: 0.84rem;
+  }
+
+  .preview-total {
+    padding-top: 6px;
+    margin-top: 6px;
+    font-size: 1rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.3rem;
+  }
+
+  .flip7-badge {
+    padding: 7px;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+
+  .scorer-actions {
+    margin-top: auto;
+  }
+
+  .scorer-btn {
+    padding: 10px var(--space-sm);
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 1366px) and (min-height: 720px) {
+  .scorer-panel {
+    max-width: min(1280px, calc(100vw - 72px));
+    max-height: min(90dvh, 860px);
+    padding: 10px 14px 12px;
+  }
+
+  .scorer-main {
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: 0 12px;
+  }
+
+  .scorer-inputs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+    grid-template-areas:
+      'numbers modifiers'
+      'numbers special';
+    gap: 10px 12px;
+    align-items: start;
+  }
+
+  .scorer-section--numbers {
+    grid-area: numbers;
+  }
+
+  .scorer-section--modifiers {
+    grid-area: modifiers;
+  }
+
+  .scorer-section--special {
+    grid-area: special;
+  }
+
+  .scorer-label {
+    margin-bottom: 5px;
+  }
+
+  .scorer-cards {
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .card-btn {
+    font-size: 0.88rem;
+  }
+
+  .scorer-hint {
+    margin-top: 2px;
+    font-size: 0.68rem;
+    line-height: 1.3;
+  }
+
+  .scorer-modifiers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .mod-btn {
+    min-width: 0;
+    padding: 7px 4px;
+    font-size: 0.82rem;
+  }
+
+  .special-toggle {
+    padding: 7px 9px;
+    font-size: 0.8rem;
+  }
+
+  .special-toggle input {
+    width: 14px;
+    height: 14px;
+  }
+
+  .scorer-summary {
+    gap: 10px;
+  }
+
+  .scorer-preview {
+    padding: 9px 11px;
+  }
+
+  .preview-row {
+    padding: 2px 0;
+    font-size: 0.8rem;
+  }
+
+  .preview-total {
+    margin-top: 5px;
+    padding-top: 5px;
+    font-size: 0.92rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.16rem;
+  }
+
+  .flip7-badge {
+    padding: 6px;
+    font-size: 0.94rem;
+  }
+
+  .scorer-btn {
+    padding: 8px 10px;
+    font-size: 0.9rem;
   }
 }
 </style>

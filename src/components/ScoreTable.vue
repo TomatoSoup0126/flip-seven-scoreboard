@@ -45,9 +45,11 @@ const emit = defineEmits(['edit-score', 'delete-player'])
 const startRound = ref(0)
 const slideDirection = ref('next') // 'next' | 'prev'
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const windowHeight = ref(typeof window !== 'undefined' ? window.innerHeight : 768)
 
 function handleResize() {
   windowWidth.value = window.innerWidth
+  windowHeight.value = window.innerHeight
 }
 
 onMounted(() => window.addEventListener('resize', handleResize))
@@ -65,9 +67,36 @@ watch(
 )
 
 const visibleRounds = computed(() => {
+  const isCompactLandscape = windowWidth.value >= 560
+    && windowHeight.value <= 620
+    && (windowWidth.value / Math.max(windowHeight.value, 1)) >= 1.45
+
+  if (isCompactLandscape) {
+    if (windowWidth.value >= 1180) return 5
+    if (windowWidth.value >= 960) return 4
+    if (windowWidth.value >= 680) return 3
+    return 2
+  }
+
+  const isPhoneLandscape = windowWidth.value >= 560
+    && windowWidth.value <= 900
+    && windowHeight.value <= 460
+    && (windowWidth.value / Math.max(windowHeight.value, 1)) >= 1.55
+
+  if (isPhoneLandscape) {
+    return 3
+  }
   if (windowWidth.value <= 480) return 2
   if (windowWidth.value <= 768) return 2
+  if (windowWidth.value >= 1200) return 4
   return 3
+})
+
+watch([() => store.rounds, visibleRounds], () => {
+  const maxStart = Math.max(0, store.rounds - visibleRounds.value)
+  if (startRound.value > maxStart) {
+    startRound.value = maxStart
+  }
 })
 
 function prevPage() {
@@ -92,6 +121,7 @@ function onDeletePlayer(playerId) {
 
 <style scoped>
 .score-table {
+  --score-grid-offset: 64px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -111,7 +141,7 @@ function onDeletePlayer(playerId) {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  min-height: 160px;
   padding: var(--space-lg);
 }
 
@@ -147,5 +177,16 @@ function onDeletePlayer(playerId) {
 .player-reorder-leave-to {
   opacity: 0;
   transform: translateX(20px);
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .score-table {
+    --score-grid-offset: 228px;
+  }
+
+  .score-table__empty {
+    min-height: 120px;
+    padding: var(--space-md);
+  }
 }
 </style>

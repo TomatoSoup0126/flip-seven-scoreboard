@@ -3,6 +3,10 @@ import { ref, computed, watch } from 'vue'
 
 const STORAGE_KEY = 'flip7-game-state'
 const UNDO_LIMIT = 20
+export const GAME_MODES = Object.freeze({
+  CLASSIC: 'classic',
+  VENGEANCE: 'vengeance'
+})
 
 const PLAYER_COLORS = [
   '#30348A', '#DD5969', '#69BDB9', '#E8873D',
@@ -27,6 +31,10 @@ function saveState(state) {
   }
 }
 
+function isValidGameMode(mode) {
+  return mode === GAME_MODES.CLASSIC || mode === GAME_MODES.VENGEANCE
+}
+
 export const useGameStore = defineStore('game', () => {
   const saved = loadState()
 
@@ -37,6 +45,7 @@ export const useGameStore = defineStore('game', () => {
   // scores structure: { [playerId]: { [roundIndex]: { score, cards, modifiers, hasX2, isFlip7, isBust } } }
   const undoStack = ref(saved?.undoStack ?? [])
   const nextPlayerId = ref(saved?.nextPlayerId ?? 1)
+  const gameMode = ref(isValidGameMode(saved?.gameMode) ? saved.gameMode : GAME_MODES.CLASSIC)
 
   // --- Computed ---
   const playersSortedByScore = computed(() => {
@@ -143,6 +152,13 @@ export const useGameStore = defineStore('game', () => {
     // Keep players
   }
 
+  function setGameMode(mode) {
+    if (!isValidGameMode(mode) || gameMode.value === mode) return
+    gameMode.value = mode
+    // A rule change starts a brand new game, while preserving player setup.
+    newGame()
+  }
+
   function resetAll() {
     players.value = []
     scores.value = {}
@@ -156,14 +172,51 @@ export const useGameStore = defineStore('game', () => {
   }
 
   // --- Calculate score from card selections ---
-  function calculateScore(cards, modifiers, hasX2) {
+  function calculateScore(cards, modifiers, hasX2, options = {}) {
+    const mode = options.mode ?? gameMode.value
+
+    if (mode === GAME_MODES.VENGEANCE) {
+      const extraLucky13 = options.extraLucky13 === true
+      const cardCount = cards.length + (extraLucky13 ? 1 : 0)
+      const hasZeroCard = cards.includes(0)
+
+      // Lucky 13 allows one extra 13 card in the same line.
+      const numberSum = cards.reduce((sum, c) => sum + c, 0) + (extraLucky13 ? 13 : 0)
+      const afterDivideBy2 = hasX2 ? Math.floor(numberSum / 2) : null
+      const modifierSum = modifiers.reduce((sum, m) => sum + m, 0)
+      const isFlip7 = cardCount === 7
+
+      let subtotal = hasX2 ? afterDivideBy2 : numberSum
+
+      // ZERO card forces score to 0 unless the player reaches Flip 7.
+      if (hasZeroCard && !isFlip7) {
+        subtotal = 0
+      } else {
+        subtotal = Math.max(0, subtotal - modifierSum)
+      }
+
+      const flip7Bonus = isFlip7 ? 15 : 0
+
+      return {
+        numberSum,
+        afterX2: null,
+        afterDivideBy2,
+        modifierSum,
+        flip7Bonus,
+        total: subtotal + flip7Bonus,
+        cardCount,
+        hasZeroCard,
+        extraLucky13
+      }
+    }
+
+    // Classic mode:
     // 1. Sum selected number cards
-    let numberSum = cards.reduce((sum, c) => sum + c, 0)
+    const numberSum = cards.reduce((sum, c) => sum + c, 0)
 
     // 2. If x2, multiply
-    if (hasX2) {
-      numberSum *= 2
-    }
+    const afterX2 = hasX2 ? numberSum * 2 : null
+    const subtotal = hasX2 ? afterX2 : numberSum
 
     // 3. Add modifier bonuses
     const modifierSum = modifiers.reduce((sum, m) => sum + m, 0)
@@ -172,11 +225,15 @@ export const useGameStore = defineStore('game', () => {
     const flip7Bonus = cards.length === 7 ? 15 : 0
 
     return {
-      numberSum: cards.reduce((s, c) => s + c, 0),
-      afterX2: hasX2 ? cards.reduce((s, c) => s + c, 0) * 2 : null,
+      numberSum,
+      afterX2,
+      afterDivideBy2: null,
       modifierSum,
       flip7Bonus,
-      total: numberSum + modifierSum + flip7Bonus
+      total: subtotal + modifierSum + flip7Bonus,
+      cardCount: cards.length,
+      hasZeroCard: false,
+      extraLucky13: false
     }
   }
 
@@ -187,7 +244,8 @@ export const useGameStore = defineStore('game', () => {
       rounds: rounds.value,
       scores: scores.value,
       undoStack: undoStack.value,
-      nextPlayerId: nextPlayerId.value
+      nextPlayerId: nextPlayerId.value,
+      gameMode: gameMode.value
     }),
     (state) => saveState(state),
     { deep: true }
@@ -199,6 +257,7 @@ export const useGameStore = defineStore('game', () => {
     scores,
     undoStack,
     nextPlayerId,
+    gameMode,
     playersSortedByScore,
     canUndo,
     getPlayerTotal,
@@ -209,8 +268,10 @@ export const useGameStore = defineStore('game', () => {
     setScore,
     undo,
     newGame,
+    setGameMode,
     resetAll,
     getWinners,
-    calculateScore
+    calculateScore,
+    GAME_MODES
   }
 })

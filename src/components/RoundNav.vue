@@ -1,5 +1,5 @@
 <template>
-  <div class="round-nav">
+  <div class="round-nav" data-tour="round-nav">
     <button
       class="round-nav__arrow round-nav__arrow--prev"
       :disabled="startRound === 0"
@@ -69,7 +69,7 @@ function onNext() {
     Right padding = player-row padding-right(16px)
     This aligns labels with score cells below.
   */
-  padding: var(--space-sm) 16px var(--space-sm) 64px;
+  padding: var(--space-sm) 16px var(--space-sm) var(--score-grid-offset, 64px);
 }
 
 .round-nav__arrow {
@@ -151,5 +151,22 @@ function onNext() {
 .slide-right-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .round-nav {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .round-nav__arrow {
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1.25rem;
+  }
+
+  .round-nav__label {
+    font-size: 0.78rem;
+  }
 }
 </style>

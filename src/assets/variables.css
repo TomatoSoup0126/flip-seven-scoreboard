@@ -126,3 +126,74 @@ input {
   white-space: nowrap;
   border: 0;
 }
+
+/* === Guided Tour === */
+[id$='-vjt-backdrop'] {
+  background-color: rgba(11, 18, 38, 0.62);
+  backdrop-filter: blur(1.5px);
+}
+
+[class*='vjt-highlight'] {
+  outline: 3px solid var(--color-highlight);
+  outline-offset: 3px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(249, 221, 105, 0.2);
+}
+
+[id$='-vjt-tooltip'] {
+  width: min(92vw, 420px);
+  max-width: min(92vw, 420px);
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #1f2348;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+[id$='-vjt-arrow']::before {
+  background: #1f2348;
+}
+
+[id$='-vjt-tooltip-content'] {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.vjt-actions {
+  margin-top: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.vjt-actions button {
+  width: auto;
+  flex: 1 1 96px;
+  min-width: 96px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border-color: rgba(255, 255, 255, 0.45);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.vjt-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 480px) {
+  [id$='-vjt-tooltip'] {
+    width: min(94vw, 360px);
+    max-width: min(94vw, 360px);
+    padding: 11px 12px;
+    font-size: 0.9rem;
+  }
+
+  .vjt-actions button {
+    flex: 1 1 88px;
+    min-width: 88px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+}

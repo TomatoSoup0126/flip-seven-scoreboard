@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import '@globalhive/vuejs-tour/dist/style.css'
 import i18n from './i18n/index.js'
 import App from './App.vue'
 import './assets/variables.css'

@@ -231,7 +231,7 @@ function getScore(roundIndex) {
 
 /* Scores wrapper for transition overflow clip */
 .player-scores-wrapper {
-  padding-left: 48px;
+  padding-left: calc(var(--score-grid-offset, 64px) - var(--space-md));
   overflow: hidden;
 }
 
@@ -261,5 +261,56 @@ function getScore(roundIndex) {
 .slide-right-leave-to {
   transform: translateX(30px);
   opacity: 0;
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .player-row {
+    display: grid;
+    grid-template-columns: minmax(170px, 220px) 1fr;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 6px var(--space-md);
+  }
+
+  .player-info {
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .player-details {
+    gap: 6px;
+  }
+
+  .player-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 0.72rem;
+  }
+
+  .player-name {
+    font-size: 0.86rem;
+  }
+
+  .player-total {
+    font-size: 1rem;
+  }
+
+  .player-delete {
+    min-width: 30px;
+    min-height: 30px;
+  }
+
+  .player-scores-wrapper {
+    padding-left: 0;
+  }
+
+  .score-cell {
+    min-height: 36px;
+    font-size: 0.92rem;
+  }
+
+  .score-bust {
+    font-size: 0.68rem;
+  }
 }
 </style>

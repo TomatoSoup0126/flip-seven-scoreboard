@@ -95,4 +95,29 @@ const { t } = useI18n()
     letter-spacing: 4px;
   }
 }
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .game-header {
+    padding: 6px var(--space-sm) 4px var(--space-sm);
+  }
+
+  .game-header__right {
+    right: 4px;
+  }
+
+  .game-header__flip {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+
+  .game-header__seven {
+    font-size: 2.2rem;
+  }
+
+  .game-header__subtitle {
+    margin-top: -2px;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+  }
+}
 </style>
