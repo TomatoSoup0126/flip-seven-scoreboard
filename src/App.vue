@@ -138,7 +138,7 @@
             <!-- Game Rules -->
             <a
               class="drawer-item drawer-item--link"
-              :href="rulesUrl"
+              href="https://theop.games/pages/flip-7"
               target="_blank"
               rel="noopener noreferrer"
               @click="showMenu = false"
@@ -300,13 +300,6 @@ const tourSteps = computed(() => ([
 
 const tourMenuLabel = computed(() => {
   return tourCompleted.value ? t('restartTour') : t('startTour')
-})
-
-const rulesUrl = computed(() => {
-  if (store.gameMode === store.GAME_MODES.VENGEANCE) {
-    return 'https://cdn.shopify.com/s/files/1/0611/3958/3198/files/26_FLIP_7_VENGEANCE_RULES_C.pdf?v=1770853609'
-  }
-  return 'https://theop.games/pages/flip-7'
 })
 
 async function startGuidedTour() {
