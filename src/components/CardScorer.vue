@@ -14,15 +14,18 @@
             <div class="scorer-label">{{ t('numberCards') }}</div>
             <div class="scorer-cards">
               <button
-                v-for="n in 13"
-                :key="n - 1"
+                v-for="n in numberCardValues"
+                :key="n"
                 class="card-btn"
-                :class="{ 'card-btn--active': selectedCards.has(n - 1) }"
-                @click="toggleCard(n - 1)"
+                :class="{ 'card-btn--active': selectedCards.has(n) }"
+                @click="toggleCard(n)"
               >
-                {{ n - 1 }}
+                {{ n }}
               </button>
             </div>
+            <p v-if="isVengeanceMode" class="scorer-hint">
+              {{ t('vengeanceNumberHint') }}
+            </p>
           </div>
 
           <!-- Modifier Cards -->
@@ -30,22 +33,36 @@
             <div class="scorer-label">{{ t('modifierCards') }}</div>
             <div class="scorer-modifiers">
               <button
-                v-for="m in [2, 4, 6, 8, 10]"
+                v-for="m in modifierValues"
                 :key="'mod-' + m"
                 class="mod-btn"
                 :class="{ 'mod-btn--active': selectedModifiers.has(m) }"
                 @click="toggleModifier(m)"
               >
-                +{{ m }}
+                {{ isVengeanceMode ? '-' : '+' }}{{ m }}
               </button>
               <button
                 class="mod-btn mod-btn--x2"
                 :class="{ 'mod-btn--active': hasX2 }"
                 @click="hasX2 = !hasX2"
               >
-                {{ t('multiplier') }}
+                {{ isVengeanceMode ? t('divideByTwo') : t('multiplier') }}
               </button>
             </div>
+          </div>
+
+          <!-- Vengeance Special Cards -->
+          <div v-if="isVengeanceMode" class="scorer-section">
+            <div class="scorer-label">{{ t('vengeanceSpecialCards') }}</div>
+            <label class="special-toggle" :class="{ 'special-toggle--disabled': !canEnableExtraLucky13 }">
+              <input
+                v-model="extraLucky13"
+                type="checkbox"
+                :disabled="!canEnableExtraLucky13"
+              >
+              <span>{{ t('lucky13Extra') }}</span>
+            </label>
+            <p class="scorer-hint">{{ t('lucky13Hint') }}</p>
           </div>
 
           <!-- Score Preview -->
@@ -58,9 +75,20 @@
               <span>{{ t('multiplier') }}</span>
               <span>{{ scoreBreakdown.afterX2 }}</span>
             </div>
+            <div v-if="scoreBreakdown.afterDivideBy2 !== null" class="preview-row preview-row--accent">
+              <span>{{ t('divideByTwo') }}</span>
+              <span>{{ scoreBreakdown.afterDivideBy2 }}</span>
+            </div>
             <div v-if="scoreBreakdown.modifierSum > 0" class="preview-row">
-              <span>{{ t('modifierBonus') }}</span>
-              <span>+{{ scoreBreakdown.modifierSum }}</span>
+              <span>{{ isVengeanceMode ? t('modifierPenalty') : t('modifierBonus') }}</span>
+              <span>{{ isVengeanceMode ? '-' : '+' }}{{ scoreBreakdown.modifierSum }}</span>
+            </div>
+            <div
+              v-if="isVengeanceMode && scoreBreakdown.hasZeroCard && scoreBreakdown.flip7Bonus === 0"
+              class="preview-row preview-row--danger"
+            >
+              <span>{{ t('zeroCardEffect') }}</span>
+              <span>{{ t('scoreForcedToZero') }}</span>
             </div>
             <div v-if="scoreBreakdown.flip7Bonus > 0" class="preview-row preview-row--flip7">
               <span>{{ t('flip7Bonus') }}</span>
@@ -73,7 +101,7 @@
           </div>
 
           <!-- Flip 7 indicator -->
-          <div v-if="selectedCards.size === 7" class="flip7-badge">
+          <div v-if="scoreBreakdown.cardCount === 7" class="flip7-badge">
             {{ t('flip7Badge') }}
           </div>
 
@@ -119,8 +147,21 @@ const store = useGameStore()
 const selectedCards = ref(new Set())
 const selectedModifiers = ref(new Set())
 const hasX2 = ref(false)
+const extraLucky13 = ref(false)
 
 const roundNumber = computed(() => props.roundIndex + 1)
+const isVengeanceMode = computed(() => store.gameMode === store.GAME_MODES.VENGEANCE)
+
+const numberCardValues = computed(() => {
+  const upperBound = isVengeanceMode.value ? 13 : 12
+  return Array.from({ length: upperBound + 1 }, (_, index) => index)
+})
+
+const modifierValues = [2, 4, 6, 8, 10]
+
+const canEnableExtraLucky13 = computed(() => {
+  return isVengeanceMode.value && selectedCards.value.has(13)
+})
 
 watch(() => props.visible, async (val) => {
   if (val) {
@@ -128,20 +169,31 @@ watch(() => props.visible, async (val) => {
       selectedCards.value = new Set(props.existingScore.cards ?? [])
       selectedModifiers.value = new Set(props.existingScore.modifiers ?? [])
       hasX2.value = props.existingScore.hasX2 ?? false
+      extraLucky13.value = props.existingScore.extraLucky13 ?? false
     } else {
       selectedCards.value = new Set()
       selectedModifiers.value = new Set()
       hasX2.value = false
+      extraLucky13.value = false
     }
     await nextTick()
     overlayRef.value?.focus()
   }
 })
 
+watch(canEnableExtraLucky13, (enabled) => {
+  if (!enabled) {
+    extraLucky13.value = false
+  }
+})
+
 const scoreBreakdown = computed(() => {
   const cards = [...selectedCards.value]
   const modifiers = [...selectedModifiers.value]
-  return store.calculateScore(cards, modifiers, hasX2.value)
+  return store.calculateScore(cards, modifiers, hasX2.value, {
+    mode: store.gameMode,
+    extraLucky13: extraLucky13.value
+  })
 })
 
 function toggleCard(num) {
@@ -167,14 +219,20 @@ function toggleModifier(mod) {
 function onConfirm() {
   const cards = [...selectedCards.value]
   const modifiers = [...selectedModifiers.value]
-  const breakdown = store.calculateScore(cards, modifiers, hasX2.value)
+  const extraLucky13Active = canEnableExtraLucky13.value && extraLucky13.value
+  const breakdown = store.calculateScore(cards, modifiers, hasX2.value, {
+    mode: store.gameMode,
+    extraLucky13: extraLucky13Active
+  })
   emit('confirm', {
     score: breakdown.total,
     cards,
     modifiers,
     hasX2: hasX2.value,
-    isFlip7: cards.length === 7,
-    isBust: false
+    extraLucky13: extraLucky13Active,
+    isFlip7: breakdown.flip7Bonus > 0,
+    isBust: false,
+    mode: store.gameMode
   })
 }
 
@@ -262,6 +320,13 @@ function onCancel() {
   gap: 6px;
 }
 
+.scorer-hint {
+  margin-top: var(--space-xs);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+
 .card-btn {
   aspect-ratio: 1;
   border-radius: var(--radius-md);
@@ -291,6 +356,29 @@ function onCancel() {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.special-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-white);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.special-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.special-toggle--disabled {
+  border-color: var(--color-disabled);
+  color: var(--color-text-muted);
 }
 
 .mod-btn {
@@ -351,6 +439,11 @@ function onCancel() {
 
 .preview-row--flip7 {
   color: var(--color-primary);
+  font-weight: 700;
+}
+
+.preview-row--danger {
+  color: var(--color-danger);
   font-weight: 700;
 }
 

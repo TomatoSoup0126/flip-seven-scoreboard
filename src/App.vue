@@ -1,9 +1,9 @@
 <template>
   <div class="app">
     <div class="app-container">
-      <GameHeader>
+      <GameHeader data-tour="header-logo">
         <template #right>
-          <button class="menu-toggle" @click="showMenu = !showMenu" :aria-label="t('menu')">
+          <button class="menu-toggle" data-tour="menu-toggle" @click="showMenu = !showMenu" :aria-label="t('menu')">
             <span class="menu-toggle__bar"></span>
             <span class="menu-toggle__bar"></span>
             <span class="menu-toggle__bar"></span>
@@ -13,6 +13,7 @@
 
       <div class="app-content">
         <ScoreTable
+          data-tour="score-table"
           @edit-score="openScorer"
           @delete-player="confirmDeletePlayer"
         />
@@ -20,7 +21,7 @@
 
       <!-- Bottom Toolbar -->
       <div class="app-toolbar">
-        <button class="toolbar-btn toolbar-btn--new" @click="confirmNewGame">
+        <button class="toolbar-btn toolbar-btn--new" data-tour="new-game-btn" @click="confirmNewGame">
           {{ t('newGame') }}
         </button>
         <button
@@ -32,6 +33,7 @@
         </button>
         <button
           class="toolbar-btn toolbar-btn--add"
+          data-tour="add-player-btn"
           :disabled="store.players.length >= 8"
           @click="showAddPlayer = true"
         >
@@ -106,10 +108,37 @@
               </div>
             </div>
 
+            <!-- Rule Mode -->
+            <div class="drawer-item drawer-item--mode">
+              <span class="drawer-item__label">{{ t('ruleMode') }}</span>
+              <div class="drawer-lang-switch">
+                <button
+                  class="drawer-lang-btn"
+                  :class="{ 'drawer-lang-btn--active': store.gameMode === store.GAME_MODES.CLASSIC }"
+                  @click="confirmSwitchMode(store.GAME_MODES.CLASSIC)"
+                >
+                  {{ t('classicModeShort') }}
+                </button>
+                <button
+                  class="drawer-lang-btn"
+                  :class="{ 'drawer-lang-btn--active': store.gameMode === store.GAME_MODES.VENGEANCE }"
+                  @click="confirmSwitchMode(store.GAME_MODES.VENGEANCE)"
+                >
+                  {{ t('vengeanceModeShort') }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Guided Tour -->
+            <button class="drawer-item drawer-item--action" @click="startGuidedTour">
+              <span class="drawer-item__label">{{ tourMenuLabel }}</span>
+              <span class="drawer-item__arrow">›</span>
+            </button>
+
             <!-- Game Rules -->
             <a
               class="drawer-item drawer-item--link"
-              href="https://theop.games/pages/flip-7"
+              :href="rulesUrl"
               target="_blank"
               rel="noopener noreferrer"
               @click="showMenu = false"
@@ -184,6 +213,16 @@
       @confirm="confirmState.onConfirm"
       @cancel="confirmState.visible = false"
     />
+
+    <VTour
+      ref="tourRef"
+      name="flip7-scoreboard-tour"
+      :steps="tourSteps"
+      :button-labels="tourButtonLabels"
+      :jump-options="{ offset: -24, duration: 350 }"
+      :aria-label="t('guidedTour')"
+      @onTourEnd="onTourEnd"
+    />
   </div>
 </template>
 
@@ -191,6 +230,7 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import confetti from 'canvas-confetti'
+import { VTour } from '@globalhive/vuejs-tour'
 import { setLocale } from './i18n/index.js'
 import { useGameStore } from './stores/game.js'
 import { useFocusTrap } from './composables/useFocusTrap.js'
@@ -202,6 +242,9 @@ import ConfirmDialog from './components/ConfirmDialog.vue'
 
 const { t, locale } = useI18n()
 const store = useGameStore()
+const TOUR_COMPLETED_KEY = 'flip7-tour-completed'
+const tourRef = ref(null)
+const tourCompleted = ref(localStorage.getItem(TOUR_COMPLETED_KEY) === 'true')
 
 // --- Menu ---
 const showMenu = ref(false)
@@ -218,6 +261,63 @@ watch(showMenu, async (val) => {
 
 function switchLocale(loc) {
   setLocale(loc)
+}
+
+const tourButtonLabels = computed(() => ({
+  next: t('tourNext'),
+  back: t('tourBack'),
+  done: t('tourDone'),
+  skip: t('tourSkip')
+}))
+
+const tourSteps = computed(() => ([
+  {
+    target: '[data-tour="header-logo"]',
+    content: t('tourStepHeader'),
+    placement: 'bottom'
+  },
+  {
+    target: '[data-tour="score-table"]',
+    content: t('tourStepScoreTable'),
+    placement: 'bottom'
+  },
+  {
+    target: '[data-tour="add-player-btn"]',
+    content: t('tourStepAddPlayer'),
+    placement: 'top'
+  },
+  {
+    target: '[data-tour="new-game-btn"]',
+    content: t('tourStepNewGame'),
+    placement: 'top'
+  },
+  {
+    target: '[data-tour="menu-toggle"]',
+    content: t('tourStepMenu'),
+    placement: 'left'
+  }
+]))
+
+const tourMenuLabel = computed(() => {
+  return tourCompleted.value ? t('restartTour') : t('startTour')
+})
+
+const rulesUrl = computed(() => {
+  if (store.gameMode === store.GAME_MODES.VENGEANCE) {
+    return 'https://cdn.shopify.com/s/files/1/0611/3958/3198/files/26_FLIP_7_VENGEANCE_RULES_C.pdf?v=1770853609'
+  }
+  return 'https://theop.games/pages/flip-7'
+})
+
+async function startGuidedTour() {
+  showMenu.value = false
+  await nextTick()
+  await tourRef.value?.startTour()
+}
+
+function onTourEnd() {
+  tourCompleted.value = true
+  localStorage.setItem(TOUR_COMPLETED_KEY, 'true')
 }
 
 // --- Dark Mode ---
@@ -304,6 +404,25 @@ function confirmResetAll() {
     store.resetAll()
     confirmState.visible = false
     winnerDismissed.value = false
+  }
+  confirmState.visible = true
+}
+
+function confirmSwitchMode(mode) {
+  if (mode === store.gameMode) return
+  showMenu.value = false
+  const modeLabel = mode === store.GAME_MODES.VENGEANCE
+    ? t('vengeanceMode')
+    : t('classicMode')
+
+  confirmState.message = t('confirmSwitchMode', { mode: modeLabel })
+  confirmState.confirmText = t('confirm')
+  confirmState.cancelText = t('cancel')
+  confirmState.onConfirm = () => {
+    store.setGameMode(mode)
+    winnerDismissed.value = false
+    prevWinnerIds.value = new Set()
+    confirmState.visible = false
   }
   confirmState.visible = true
 }
@@ -407,7 +526,7 @@ watch(() => store.rounds, (val) => {
 
 .app-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 980px;
   background: var(--color-container);
   border: 2px solid var(--color-container-border);
   border-radius: var(--radius-lg);
@@ -619,7 +738,24 @@ watch(() => store.rounds, (val) => {
   transition: background var(--transition-fast);
 }
 
+.drawer-item--action {
+  width: 100%;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.drawer-item--mode {
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
 .drawer-item--link:active {
+  background: var(--color-teal-light);
+}
+
+.drawer-item--action:active {
   background: var(--color-teal-light);
 }
 
@@ -740,6 +876,31 @@ watch(() => store.rounds, (val) => {
   .toolbar-btn {
     font-size: 0.9rem;
     padding: 12px var(--space-sm);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .app {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .app-container {
+    min-height: calc(100dvh - var(--space-sm));
+    border-radius: var(--radius-md);
+  }
+
+  .app-content {
+    padding: 0 var(--space-xs);
+  }
+
+  .app-toolbar {
+    padding: var(--space-xs) var(--space-xs) var(--space-sm);
+    gap: 6px;
+  }
+
+  .toolbar-btn {
+    padding: 10px var(--space-sm);
+    font-size: 0.86rem;
   }
 }
 </style>
