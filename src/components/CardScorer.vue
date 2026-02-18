@@ -9,110 +9,116 @@
             <button class="scorer-close" @click="onCancel" :aria-label="t('close')">✕</button>
           </div>
 
-          <!-- Number Cards -->
-          <div class="scorer-section">
-            <div class="scorer-label">{{ t('numberCards') }}</div>
-            <div class="scorer-cards">
-              <button
-                v-for="n in numberCardValues"
-                :key="n"
-                class="card-btn"
-                :class="{ 'card-btn--active': selectedCards.has(n) }"
-                @click="toggleCard(n)"
-              >
-                {{ n }}
-              </button>
-            </div>
-            <p v-if="isVengeanceMode" class="scorer-hint">
-              {{ t('vengeanceNumberHint') }}
-            </p>
-          </div>
+          <div class="scorer-main">
+            <div class="scorer-inputs">
+              <!-- Number Cards -->
+              <div class="scorer-section scorer-section--numbers">
+                <div class="scorer-label">{{ t('numberCards') }}</div>
+                <div class="scorer-cards">
+                  <button
+                    v-for="n in numberCardValues"
+                    :key="n"
+                    class="card-btn"
+                    :class="{ 'card-btn--active': selectedCards.has(n) }"
+                    @click="toggleCard(n)"
+                  >
+                    {{ n }}
+                  </button>
+                </div>
+                <p v-if="isVengeanceMode" class="scorer-hint">
+                  {{ t('vengeanceNumberHint') }}
+                </p>
+              </div>
 
-          <!-- Modifier Cards -->
-          <div class="scorer-section">
-            <div class="scorer-label">{{ t('modifierCards') }}</div>
-            <div class="scorer-modifiers">
-              <button
-                v-for="m in modifierValues"
-                :key="'mod-' + m"
-                class="mod-btn"
-                :class="{ 'mod-btn--active': selectedModifiers.has(m) }"
-                @click="toggleModifier(m)"
-              >
-                {{ isVengeanceMode ? '-' : '+' }}{{ m }}
-              </button>
-              <button
-                class="mod-btn mod-btn--x2"
-                :class="{ 'mod-btn--active': hasX2 }"
-                @click="hasX2 = !hasX2"
-              >
-                {{ isVengeanceMode ? t('divideByTwo') : t('multiplier') }}
-              </button>
-            </div>
-          </div>
+              <!-- Modifier Cards -->
+              <div class="scorer-section scorer-section--modifiers">
+                <div class="scorer-label">{{ t('modifierCards') }}</div>
+                <div class="scorer-modifiers">
+                  <button
+                    v-for="m in modifierValues"
+                    :key="'mod-' + m"
+                    class="mod-btn"
+                    :class="{ 'mod-btn--active': selectedModifiers.has(m) }"
+                    @click="toggleModifier(m)"
+                  >
+                    {{ isVengeanceMode ? '-' : '+' }}{{ m }}
+                  </button>
+                  <button
+                    class="mod-btn mod-btn--x2"
+                    :class="{ 'mod-btn--active': hasX2 }"
+                    @click="hasX2 = !hasX2"
+                  >
+                    {{ isVengeanceMode ? t('divideByTwo') : t('multiplier') }}
+                  </button>
+                </div>
+              </div>
 
-          <!-- Vengeance Special Cards -->
-          <div v-if="isVengeanceMode" class="scorer-section">
-            <div class="scorer-label">{{ t('vengeanceSpecialCards') }}</div>
-            <label class="special-toggle" :class="{ 'special-toggle--disabled': !canEnableExtraLucky13 }">
-              <input
-                v-model="extraLucky13"
-                type="checkbox"
-                :disabled="!canEnableExtraLucky13"
-              >
-              <span>{{ t('lucky13Extra') }}</span>
-            </label>
-            <p class="scorer-hint">{{ t('lucky13Hint') }}</p>
-          </div>
+              <!-- Vengeance Special Cards -->
+              <div v-if="isVengeanceMode" class="scorer-section scorer-section--special">
+                <div class="scorer-label">{{ t('vengeanceSpecialCards') }}</div>
+                <label class="special-toggle" :class="{ 'special-toggle--disabled': !canEnableExtraLucky13 }">
+                  <input
+                    v-model="extraLucky13"
+                    type="checkbox"
+                    :disabled="!canEnableExtraLucky13"
+                  >
+                  <span>{{ t('lucky13Extra') }}</span>
+                </label>
+                <p class="scorer-hint">{{ t('lucky13Hint') }}</p>
+              </div>
+            </div>
 
-          <!-- Score Preview -->
-          <div class="scorer-preview">
-            <div class="preview-row">
-              <span>{{ t('numberCardSum') }}</span>
-              <span>{{ scoreBreakdown.numberSum }}</span>
-            </div>
-            <div v-if="scoreBreakdown.afterX2 !== null" class="preview-row preview-row--accent">
-              <span>{{ t('multiplier') }}</span>
-              <span>{{ scoreBreakdown.afterX2 }}</span>
-            </div>
-            <div v-if="scoreBreakdown.afterDivideBy2 !== null" class="preview-row preview-row--accent">
-              <span>{{ t('divideByTwo') }}</span>
-              <span>{{ scoreBreakdown.afterDivideBy2 }}</span>
-            </div>
-            <div v-if="scoreBreakdown.modifierSum > 0" class="preview-row">
-              <span>{{ isVengeanceMode ? t('modifierPenalty') : t('modifierBonus') }}</span>
-              <span>{{ isVengeanceMode ? '-' : '+' }}{{ scoreBreakdown.modifierSum }}</span>
-            </div>
-            <div
-              v-if="isVengeanceMode && scoreBreakdown.hasZeroCard && scoreBreakdown.flip7Bonus === 0"
-              class="preview-row preview-row--danger"
-            >
-              <span>{{ t('zeroCardEffect') }}</span>
-              <span>{{ t('scoreForcedToZero') }}</span>
-            </div>
-            <div v-if="scoreBreakdown.flip7Bonus > 0" class="preview-row preview-row--flip7">
-              <span>{{ t('flip7Bonus') }}</span>
-              <span>+{{ scoreBreakdown.flip7Bonus }}</span>
-            </div>
-            <div class="preview-total">
-              <span>{{ t('roundTotal') }}</span>
-              <span class="preview-total__score">{{ scoreBreakdown.total }}</span>
-            </div>
-          </div>
+            <div class="scorer-summary">
+              <!-- Score Preview -->
+              <div class="scorer-preview">
+                <div class="preview-row">
+                  <span>{{ t('numberCardSum') }}</span>
+                  <span>{{ scoreBreakdown.numberSum }}</span>
+                </div>
+                <div v-if="scoreBreakdown.afterX2 !== null" class="preview-row preview-row--accent">
+                  <span>{{ t('multiplier') }}</span>
+                  <span>{{ scoreBreakdown.afterX2 }}</span>
+                </div>
+                <div v-if="scoreBreakdown.afterDivideBy2 !== null" class="preview-row preview-row--accent">
+                  <span>{{ t('divideByTwo') }}</span>
+                  <span>{{ scoreBreakdown.afterDivideBy2 }}</span>
+                </div>
+                <div v-if="scoreBreakdown.modifierSum > 0" class="preview-row">
+                  <span>{{ isVengeanceMode ? t('modifierPenalty') : t('modifierBonus') }}</span>
+                  <span>{{ isVengeanceMode ? '-' : '+' }}{{ scoreBreakdown.modifierSum }}</span>
+                </div>
+                <div
+                  v-if="isVengeanceMode && scoreBreakdown.hasZeroCard && scoreBreakdown.flip7Bonus === 0"
+                  class="preview-row preview-row--danger"
+                >
+                  <span>{{ t('zeroCardEffect') }}</span>
+                  <span>{{ t('scoreForcedToZero') }}</span>
+                </div>
+                <div v-if="scoreBreakdown.flip7Bonus > 0" class="preview-row preview-row--flip7">
+                  <span>{{ t('flip7Bonus') }}</span>
+                  <span>+{{ scoreBreakdown.flip7Bonus }}</span>
+                </div>
+                <div class="preview-total">
+                  <span>{{ t('roundTotal') }}</span>
+                  <span class="preview-total__score">{{ scoreBreakdown.total }}</span>
+                </div>
+              </div>
 
-          <!-- Flip 7 indicator -->
-          <div v-if="scoreBreakdown.cardCount === 7" class="flip7-badge">
-            {{ t('flip7Badge') }}
-          </div>
+              <!-- Flip 7 indicator -->
+              <div v-if="scoreBreakdown.cardCount === 7" class="flip7-badge">
+                {{ t('flip7Badge') }}
+              </div>
 
-          <!-- Actions -->
-          <div class="scorer-actions">
-            <button class="scorer-btn scorer-btn--bust" @click="onBust">
-              {{ t('bust') }}
-            </button>
-            <button class="scorer-btn scorer-btn--confirm" @click="onConfirm">
-              {{ t('confirm') }}
-            </button>
+              <!-- Actions -->
+              <div class="scorer-actions">
+                <button class="scorer-btn scorer-btn--bust" @click="onBust">
+                  {{ t('bust') }}
+                </button>
+                <button class="scorer-btn scorer-btn--confirm" @click="onConfirm">
+                  {{ t('confirm') }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -274,6 +280,19 @@ function onCancel() {
   box-shadow: var(--shadow-lg);
 }
 
+.scorer-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.scorer-inputs,
+.scorer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
 .scorer-header {
   display: flex;
   align-items: center;
@@ -301,7 +320,7 @@ function onCancel() {
 }
 
 .scorer-section {
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
 }
 
 .scorer-label {
@@ -421,7 +440,7 @@ function onCancel() {
   background: var(--color-white);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
 }
 
 .preview-row {
@@ -467,7 +486,7 @@ function onCancel() {
 .flip7-badge {
   text-align: center;
   padding: var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin-bottom: 0;
   background: linear-gradient(135deg, var(--color-highlight), #FFB347);
   border-radius: var(--radius-md);
   font-family: var(--font-display);
@@ -541,7 +560,118 @@ function onCancel() {
   }
   .scorer-panel {
     border-radius: var(--radius-lg);
-    max-height: 80dvh;
+    max-width: 760px;
+    max-height: 88dvh;
+    padding: 14px var(--space-md) var(--space-md);
+  }
+
+  .card-btn {
+    font-size: 1rem;
+  }
+
+  .scorer-btn {
+    padding: 12px var(--space-md);
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 640px) {
+  .scorer-panel {
+    max-width: min(980px, calc(100vw - 48px));
+    max-height: min(94dvh, 860px);
+    overflow-y: auto;
+    padding: 12px var(--space-md) var(--space-md);
+  }
+
+  .scorer-header {
+    margin-bottom: 10px;
+  }
+
+  .scorer-title {
+    font-size: 1rem;
+  }
+
+  .scorer-close {
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .scorer-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+    gap: 0 var(--space-md);
+    align-items: start;
+  }
+
+  .scorer-inputs {
+    gap: 12px;
+  }
+
+  .scorer-summary {
+    gap: 12px;
+  }
+
+  .scorer-label {
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+  }
+
+  .scorer-cards {
+    gap: 5px;
+  }
+
+  .scorer-hint {
+    margin-top: 3px;
+    font-size: 0.72rem;
+  }
+
+  .card-btn {
+    font-size: 0.95rem;
+  }
+
+  .mod-btn {
+    min-width: 64px;
+    padding: 8px 6px;
+    font-size: 0.9rem;
+  }
+
+  .special-toggle {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .scorer-preview {
+    padding: 10px 12px;
+  }
+
+  .preview-row {
+    padding: 3px 0;
+    font-size: 0.84rem;
+  }
+
+  .preview-total {
+    padding-top: 6px;
+    margin-top: 6px;
+    font-size: 1rem;
+  }
+
+  .preview-total__score {
+    font-size: 1.3rem;
+  }
+
+  .flip7-badge {
+    padding: 7px;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+
+  .scorer-actions {
+    margin-top: auto;
+  }
+
+  .scorer-btn {
+    padding: 10px var(--space-sm);
+    font-size: 0.95rem;
   }
 }
 </style>

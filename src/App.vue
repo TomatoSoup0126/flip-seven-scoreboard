@@ -743,8 +743,12 @@ watch(() => store.rounds, (val) => {
 }
 
 .drawer-item--mode {
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-sm);
+}
+
+.drawer-item--mode .drawer-item__label {
+  align-self: center;
 }
 
 .drawer-item--link:active {
