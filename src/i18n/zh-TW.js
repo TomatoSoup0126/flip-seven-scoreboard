@@ -74,7 +74,7 @@ export default {
   tourStepAddPlayer: '先從這裡新增玩家（最多 8 位）。',
   tourStepNewGame: '新遊戲會清空本局分數，但保留玩家名單。',
   tourStepMenu: '這裡可開啟選單，切換語言、深色模式與規則模式。',
-  gameRules: '官方網站',
+  gameRules: '官方規則',
   resetAll: '重置所有資料',
   confirmResetAll: '確定要重置所有資料嗎？玩家與分數將全部清除。',
   supportUs: 'Buy Me a Coffee',

@@ -74,7 +74,7 @@ export default {
   tourStepAddPlayer: 'Start by adding players here (up to 8).',
   tourStepNewGame: 'New Game clears round scores but keeps player setup.',
   tourStepMenu: 'Open this menu to change language, dark mode, and rule mode.',
-  gameRules: 'Official Website',
+  gameRules: 'Official Rules',
   resetAll: 'Reset All Data',
   confirmResetAll: 'Reset all data? All players and scores will be cleared.',
   supportUs: 'Buy Me a Coffee',
